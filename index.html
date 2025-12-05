@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indicador E-Master</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  h2 {
+    margin-bottom: 0px;
+    text-align: center;
+  }
+
+  #circulo-aspecto {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: grey;
+    transition: background-color 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    position: relative;
+  }
+
+  /* Parpadeo del círculo Cargando */
+  .loading {
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+  }
+
+  /* Estado de error */
+  .error {
+    background-color: #555 !important;
+    animation: none;
+    position: relative;
+  }
+
+  .error::after {
+    content: "×";
+    font-size: 28px;
+    color: white;
+    font-weight: 300; /* Refinamiento de X */
+    position: absolute;
+    top: 44%;
+    left: 51%;
+    transform: translate(-50%, -50%);
+    line-height: 1;
+  }
+  
+  h6 {
+      text-align: justify;
+  }
+</style>
+</head>
+<body>
+<h2>Aspecto de energía predominante</h2>
+
+<h6>El círculo muestra en tiempo real el estado del aspecto energético predominante ambiental mediante colores de estado, que van comprendidos entre un estado óptimo (verde) y un estado crítico (rojo). El efecto palpable es a nivel general. Un estado óptimo indica que las energías influyentes suelen ser más positivas, mientras que un estado crítico muestra energías influyentes menos favorables o negativas que afectan la sociedad o el ambiente circundante. ESTO APUNTA A LA TENDENCIA COLECTIVA, PERO NO A LA INDIVIDUAL, YA QUE ESTE ÚLTIMO DEPENDE MUCHO MÁS DE LA IDIOSINCRASIA. Solo se tienen en cuenta las energías más importantes y principales. Las energías pueden fluctuar en tiempos variables. Este indicador está configurado más concretamente para España, aunque las influencias pueden ser similares en el resto del mundo.<br><br>Si persiste "×" (Error) pruebe borrar la caché de su navegador.</h6>
+<div id="circulo-aspecto" class="loading"></div>
+
+<script>
+const circulo = document.getElementById('circulo-aspecto');
+
+// Colores según energía media
+const colorMap = { rojo: 'red', naranja: 'orange', amarillo: 'yellow', verde: 'green' };
+
+// Valores ponderados por aspecto
+const ponderacion = { 'square': -2, 'opposition': -1, 'conjunction': 0, 'sextile': 1, 'trine': 2 };
+const aspectosValidos = Object.keys(ponderacion);
+
+// Calcular porcentaje de energía
+function porcentajeEnergia(aspectos) {
+  if (!aspectos || aspectos.length === 0) return null;
+  let suma = 0, max = 0, min = 0;
+  aspectos.forEach(a => {
+    const val = ponderacion[a.aspecto.toLowerCase()] ?? 0;
+    suma += val;
+    max += Math.max(...Object.values(ponderacion));
+    min += Math.min(...Object.values(ponderacion));
+  });
+  return ((suma - min) / (max - min)) * 100;
+}
+
+// Obtener aspectos
+async function obtenerAspectos() {
+  try {
+    const proxy = 'https://api.allorigins.win/raw?url=';
+    const url = 'https://www.biorritmoastral.com/feature/planetas';
+    const res = await fetch(proxy + encodeURIComponent(url) + '&_=' + Date.now());
+    const htmlText = await res.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlText, 'text/html');
+
+    const scripts = Array.from(doc.querySelectorAll('script'));
+    let aspectosJson = null;
+    scripts.forEach(s => {
+      if (s.textContent.includes('const aspects')) {
+        const match = s.textContent.match(/const aspects\s*=\s*(\[[\s\S]*?\]);/);
+        if (match) aspectosJson = JSON.parse(match[1]);
+      }
+    });
+
+    if (!aspectosJson) return [];
+    return aspectosJson
+      .filter(a => aspectosValidos.includes(a.aspect.name.toLowerCase()))
+      .map(a => ({ aspecto: a.aspect.name }));
+
+  } catch(e) {
+    return [];
+  }
+}
+
+// Actualizar círculo
+async function actualizarCirculo() {
+  circulo.classList.add('loading');
+  circulo.classList.remove('error');
+  circulo.textContent = ''; // Nada mientras carga
+
+  const aspectos = await obtenerAspectos();
+
+  if (!aspectos || aspectos.length === 0) {
+    circulo.classList.remove('loading');
+    circulo.classList.add('error');
+    circulo.style.backgroundColor = '#555';
+    return;
+  }
+
+  // Calcular porcentaje
+  const porcentaje = porcentajeEnergia(aspectos);
+
+  // Determinar color según el rango
+  let color;
+  if (porcentaje <= -50) color = colorMap.rojo;       // -100 a -50
+  else if (porcentaje <= 0) color = colorMap.naranja; // -51 a 0
+  else if (porcentaje <= 50) color = colorMap.amarillo; // 1 a 50
+  else color = colorMap.verde;                        // 51 a 100
+
+  // Aplicar color (sin texto)
+  circulo.classList.remove('loading', 'error');
+  circulo.style.backgroundColor = color;
+  circulo.textContent = '';
+}
+
+// Actualización cada minuto
+actualizarCirculo();
+setInterval(actualizarCirculo, 60000);
+</script>
+</body>
+</html>
