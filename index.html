@@ -34,7 +34,7 @@
     position: relative;
   }
 
-  /* Parpadeo del círculo Cargando */
+  /* Parpadeo del cÃ­rculo Cargando */
   .loading {
     animation: pulse 1s infinite;
   }
@@ -53,14 +53,12 @@
   }
 
   .error::after {
-    content: "×";
-    font-size: 28px;
+    content: "Ã—";
+    font-size: 30px;
     color: white;
-    font-weight: 300; /* Refinamiento de X */
+    font-weight: 100; /* Refinamiento de X */
     position: absolute;
-    top: 44%;
-    left: 51%;
-    transform: translate(-50%, -50%);
+    transform: translate(0%, 0%);
     line-height: 1;
   }
   
@@ -70,22 +68,22 @@
 </style>
 </head>
 <body>
-<h2>Aspecto de energía predominante</h2>
+<h2>Aspecto de energÃ­a predominante</h2>
 
-<h6>El círculo muestra en tiempo real el estado del aspecto energético predominante ambiental mediante colores de estado, que van comprendidos entre un estado óptimo (verde) y un estado crítico (rojo). El efecto palpable es a nivel general. Un estado óptimo indica que las energías influyentes suelen ser más positivas, mientras que un estado crítico muestra energías influyentes menos favorables o negativas que afectan la sociedad o el ambiente circundante. ESTO APUNTA A LA TENDENCIA COLECTIVA, PERO NO A LA INDIVIDUAL, YA QUE ESTE ÚLTIMO DEPENDE MUCHO MÁS DE LA IDIOSINCRASIA. Solo se tienen en cuenta las energías más importantes y principales. Las energías pueden fluctuar en tiempos variables. Este indicador está configurado más concretamente para España, aunque las influencias pueden ser similares en el resto del mundo.<br><br>Si persiste "×" (Error) pruebe borrar la caché de su navegador.</h6>
+<h6>El cÃ­rculo muestra en tiempo real el estado del aspecto energÃ©tico predominante ambiental mediante colores de estado, que van comprendidos entre un estado Ã³ptimo (verde) y un estado crÃ­tico (rojo). El efecto palpable es a nivel general. Un estado Ã³ptimo indica que las energÃ­as influyentes suelen ser mÃ¡s positivas, mientras que un estado crÃ­tico muestra energÃ­as influyentes menos favorables o negativas que afectan la sociedad o el ambiente circundante. ESTO APUNTA A LA TENDENCIA COLECTIVA, PERO NO A LA INDIVIDUAL, YA QUE ESTE ÃšLTIMO DEPENDE MUCHO MÃS DE LA IDIOSINCRASIA. Solo se tienen en cuenta las energÃ­as mÃ¡s importantes y principales. Las energÃ­as pueden fluctuar en tiempos variables. Este indicador estÃ¡ configurado mÃ¡s concretamente para EspaÃ±a, aunque las influencias pueden ser similares en el resto del mundo.<br><br>Si persiste "Ã—" (Error) pruebe borrar la cachÃ© de su navegador.</h6>
 <div id="circulo-aspecto" class="loading"></div>
 
 <script>
 const circulo = document.getElementById('circulo-aspecto');
 
-// Colores según energía media
+// Colores segÃºn energÃ­a media
 const colorMap = { rojo: 'red', naranja: 'orange', amarillo: 'yellow', verde: 'green' };
 
 // Valores ponderados por aspecto
 const ponderacion = { 'square': -2, 'opposition': -1, 'conjunction': 0, 'sextile': 1, 'trine': 2 };
 const aspectosValidos = Object.keys(ponderacion);
 
-// Calcular porcentaje de energía
+// Calcular porcentaje de energÃ­a
 function porcentajeEnergia(aspectos) {
   if (!aspectos || aspectos.length === 0) return null;
   let suma = 0, max = 0, min = 0;
@@ -127,7 +125,7 @@ async function obtenerAspectos() {
   }
 }
 
-// Actualizar círculo
+// Actualizar cÃ­rculo
 async function actualizarCirculo() {
   circulo.classList.add('loading');
   circulo.classList.remove('error');
@@ -145,7 +143,7 @@ async function actualizarCirculo() {
   // Calcular porcentaje
   const porcentaje = porcentajeEnergia(aspectos);
 
-  // Determinar color según el rango
+  // Determinar color segÃºn el rango
   let color;
   if (porcentaje <= -50) color = colorMap.rojo;       // -100 a -50
   else if (porcentaje <= 0) color = colorMap.naranja; // -51 a 0
@@ -158,7 +156,7 @@ async function actualizarCirculo() {
   circulo.textContent = '';
 }
 
-// Actualización cada minuto
+// ActualizaciÃ³n cada minuto
 actualizarCirculo();
 setInterval(actualizarCirculo, 60000);
 </script>
