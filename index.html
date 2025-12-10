@@ -52,14 +52,18 @@
     position: relative;
   }
 
+  /* SVG de "X" centrado */
   .error::after {
-    content: "×";
-    font-size: 28px;
-    color: white;
-    font-weight: 300; /* Refinamiento de X */
+    content: "";
     position: absolute;
-    transform: translate(0%, 0%);
-    line-height: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;   /* ajustable según el tamaño del círculo */
+    height: 20px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><line x1="4" y1="4" x2="20" y2="20" stroke="white" stroke-width="2"/><line x1="20" y1="4" x2="4" y2="20" stroke="white" stroke-width="2"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
   }
   
   h6 {
@@ -71,6 +75,7 @@
 <h2>Aspecto de energía predominante</h2>
 
 <h6>El círculo muestra en tiempo real el estado del aspecto energético predominante ambiental mediante colores de estado, que van comprendidos entre un estado óptimo (verde) y un estado crítico (rojo). El efecto palpable es a nivel general. Un estado óptimo indica que las energías influyentes suelen ser más positivas, mientras que un estado crítico muestra energías influyentes menos favorables o negativas que afectan la sociedad o el ambiente circundante. ESTO APUNTA A LA TENDENCIA COLECTIVA, PERO NO A LA INDIVIDUAL, YA QUE ESTE ÚLTIMO DEPENDE MUCHO MÁS DE LA IDIOSINCRASIA. Solo se tienen en cuenta las energías más importantes y principales. Las energías pueden fluctuar en tiempos variables. Este indicador está configurado más concretamente para España, aunque las influencias pueden ser similares en el resto del mundo.<br><br>Si persiste "×" (Error) pruebe borrar la caché de su navegador.</h6>
+
 <div id="circulo-aspecto" class="loading"></div>
 
 <script>
