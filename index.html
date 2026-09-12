@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Indicador E-Master</title>
 <link rel="icon" href="https://img.icons8.com/fluency/10000/universe.png">
-<link href="https://fonts.cdnfonts.com/css/product-sans" rel="stylesheet">
-
-<style>
+<link href="https://fonts.cdnfonts.com/css/product-sans" rel="stylesheet"><style>
   body {
     font-family: 'Product Sans', sans-serif;
     background: #f5f5f5;
@@ -72,20 +69,9 @@
   h5 {
     text-align: justify;
   }
-</style>
-</head>
-
-<body>
-
-<h2>Aspecto de energía predominante</h2>
-
-<h6>
+</style></head><body><h2>Aspecto de energía predominante</h2><h6>
 El círculo muestra en tiempo real el estado del aspecto energético predominante ambiental mediante colores de estado, que van comprendidos entre un estado óptimo (verde) y un estado crítico (rojo). El efecto palpable es a nivel general. Un estado óptimo indica que las energías influyentes suelen ser más positivas, mientras que un estado crítico muestra energías influyentes menos favorables o negativas que afectan la sociedad o el ambiente circundante. ESTO APUNTA A LA TENDENCIA COLECTIVA, PERO NO A LA INDIVIDUAL, YA QUE ESTE ÚLTIMO DEPENDE MUCHO MÁS DE LA IDIOSINCRASIA. Solo se tienen en cuenta las energías más importantes y principales. Las energías pueden fluctuar en tiempos variables. Este indicador está configurado más concretamente para España, aunque las influencias pueden ser similares en el resto del mundo.
-</h6>
-
-<div id="circulo-aspecto" class="loading"></div>
-
-<script>
+</h6><div id="circulo-aspecto" class="loading"></div><script>
 
 const circulo = document.getElementById("circulo-aspecto");
 
@@ -125,46 +111,35 @@ const planetasPrincipales = [
 
 const equivalenciasPlanetas = {
 
-  /* Sol */
   "sun": "Sun",
   "sol": "Sun",
 
-  /* Luna */
   "moon": "Moon",
   "luna": "Moon",
 
-  /* Mercurio */
   "mercury": "Mercury",
   "mercurio": "Mercury",
 
-  /* Venus */
   "venus": "Venus",
 
-  /* Marte */
   "mars": "Mars",
   "marte": "Mars",
 
-  /* Júpiter */
   "jupiter": "Jupiter",
 
-  /* Saturno */
   "saturn": "Saturn",
   "saturno": "Saturn",
 
-  /* Urano */
   "uranus": "Uranus",
   "urano": "Uranus",
 
-  /* Neptuno */
   "neptune": "Neptune",
   "neptuno": "Neptune",
 
-  /* Plutón */
   "pluto": "Pluto",
   "pluton": "Pluto",
   "plutón": "Pluto",
 
-  /* Nodo Norte */
   "north node": "North Node",
   "north_node": "North Node",
   "northnode": "North Node",
@@ -176,12 +151,10 @@ const equivalenciasPlanetas = {
   "nodo_norte": "North Node",
   "nodo norte verdadero": "North Node",
 
-  /* Ascendente */
   "ascendant": "Ascendant",
   "asc": "Ascendant",
   "ascendente": "Ascendant",
 
-  /* Medio Cielo */
   "midheaven": "Midheaven",
   "mid heaven": "Midheaven",
   "mc": "Midheaven",
@@ -457,8 +430,7 @@ function calcularAspectos(planetas) {
 
 
     /*
-      Normalizamos el nombre para
-      poder reconocer las equivalencias.
+      Normalizamos el nombre.
     */
 
     const nombreNormalizado =
@@ -543,7 +515,17 @@ function calcularAspectos(planetas) {
 
   if (posicionesUnicas.length < 2) {
 
-    return [];
+    return {
+
+      aspectos: [],
+
+      numeroPuntos:
+        posicionesUnicas.length,
+
+      puntos:
+        posicionesUnicas
+
+    };
 
   }
 
@@ -552,8 +534,16 @@ function calcularAspectos(planetas) {
 
 
   /*
-    Comparamos cada punto una sola vez
-    para evitar duplicar los aspectos.
+    Comparamos cada punto una sola vez.
+
+    IMPORTANTE:
+
+    Solo se añaden los pares que
+    realmente forman uno de los
+    cinco aspectos reconocidos.
+
+    Los pares sin aspecto NO entran
+    en la media.
   */
 
   for (
@@ -659,42 +649,41 @@ function calcularAspectos(planetas) {
 
 
 /*
-  CALCULAR GIZMO Y PORCENTAJE
+  CALCULAR E-MASTER
 
-  El sistema completo utiliza 13 puntos.
+  AHORA NO SE UTILIZA PORCENTAJE.
 
-  13 puntos =
-  13 × 12 / 2 =
-  78 pares posibles.
+  Cada aspecto tiene una ponderación:
 
-  Cada par puede aportar como máximo +2
-  o como mínimo -2.
+  Cuadratura = -2
+  Oposición  = -1
+  Conjunción =  0
+  Sextil     = +1
+  Trígono    = +2
 
-  Máximo:
-  78 × +2 = +156 Gizmo
+  Se suman únicamente los aspectos
+  encontrados.
 
-  Mínimo:
-  78 × -2 = -156 Gizmo
+  Después se calcula la MEDIA:
 
-  Por tanto:
+      media = suma / número de aspectos
 
-  -156 Gizmo = -100%
-       0 Gizmo = 0%
-  +156 Gizmo = +100%
-
-  Los pares que no forman ninguno de los
-  cinco aspectos aportan 0, pero siguen
-  formando parte de las 78 posibilidades.
+  Por tanto, el resultado siempre
+  estará entre -2 y +2.
 */
 
 function calcularEnergia(aspectos) {
 
-  let gizmo = 0;
+  let suma = 0;
 
+
+  /*
+    Sumamos el valor de cada aspecto.
+  */
 
   for (const aspecto of aspectos) {
 
-    gizmo +=
+    suma +=
       ponderacion[
         aspecto.aspecto
       ] ?? 0;
@@ -703,57 +692,78 @@ function calcularEnergia(aspectos) {
 
 
   /*
-    Siempre utilizamos los 13 puntos
-    definidos por el sistema.
+    Número real de aspectos encontrados.
+
+    Los pares que NO forman aspecto
+    no se contabilizan.
   */
 
-  const totalPares =
-
-    planetasPrincipales.length *
-    (planetasPrincipales.length - 1) /
-    2;
+  const numeroAspectos =
+    aspectos.length;
 
 
   /*
-    13 puntos = 78 pares
-    78 × 2 = 156 Gizmo máximos
+    Si no existe ningún aspecto,
+    utilizamos 0 como estado neutro.
   */
 
-  const maximoGizmo =
-    totalPares * 2;
+  let media = 0;
 
 
-  const minimoGizmo =
-    totalPares * -2;
+  if (numeroAspectos > 0) {
 
+    media =
+      suma /
+      numeroAspectos;
 
-  /*
-    Escala firmada:
-
-    -156 → -100%
-       0 →    0%
-    +156 → +100%
-  */
-
-  const porcentaje =
-
-    (gizmo / maximoGizmo) * 100;
+  }
 
 
   return {
 
-    gizmo: gizmo,
+    suma: suma,
 
-    porcentaje: porcentaje,
+    numeroAspectos:
+      numeroAspectos,
 
-    totalPares: totalPares,
-
-    maximoGizmo: maximoGizmo,
-
-    minimoGizmo: minimoGizmo
+    media: media
 
   };
 
+}
+
+
+/*
+  DETERMINAR COLOR SEGÚN LA MEDIA
+
+  Rango completo:
+
+       -2                 +2
+        |-----------------|
+       ROJO              VERDE
+
+
+  -2 a < -1,5  = rojo
+  -1,5 a < -0,5 = naranja
+  -0,5 a < +0,5 = amarillo
+  +0,5 a +2     = verde
+*/
+
+function obtenerColor(media) {
+
+    if (media <= -2) {
+        return "red";
+    }
+
+    if (media <= -1) {
+        return "orange";
+    }
+
+    if (media < 1) {
+        return "yellow";
+    }
+
+    return "green";
 }
 
 
@@ -905,14 +915,8 @@ async function actualizarCirculo() {
 
 
     /*
-      Aunque no haya ningún aspecto,
-      NO es un error.
-
-      En ese caso:
-
-      Gizmo = 0
-      Porcentaje = 0%
-      Color = amarillo
+      Calcular la energía mediante
+      la MEDIA de los aspectos.
     */
 
     const energia =
@@ -921,45 +925,19 @@ async function actualizarCirculo() {
       );
 
 
-    const porcentaje =
-      energia.porcentaje;
+    const media =
+      energia.media;
 
 
     /*
-      COLORES DEL E-MASTER
-
-      -100 a -50,01 = rojo
-      -50 a -0,01   = naranja
-       0 a 49,99    = amarillo
-       50 a 100     = verde
+      Obtener color a partir de
+      la media -2 ... +2.
     */
 
-    let color;
-
-
-    if (porcentaje < -50) {
-
-      color = "red";
-
-    }
-
-    else if (porcentaje < 0) {
-
-      color = "orange";
-
-    }
-
-    else if (porcentaje < 50) {
-
-      color = "yellow";
-
-    }
-
-    else {
-
-      color = "green";
-
-    }
+    const color =
+      obtenerColor(
+        media
+      );
 
 
     circulo.classList.remove(
@@ -993,33 +971,23 @@ async function actualizarCirculo() {
     );
 
     console.log(
-      "PARES POSIBLES:",
-      energia.totalPares
+      "GIZMO / SUMA:",
+      energia.suma
     );
 
     console.log(
-      "GIZMO:",
-      energia.gizmo
+      "NÚMERO DE ASPECTOS:",
+      energia.numeroAspectos
     );
 
     console.log(
-      "GIZMO MÁXIMO:",
-      energia.maximoGizmo
+      "MEDIA:",
+      media.toFixed(2)
     );
 
     console.log(
-      "GIZMO MÍNIMO:",
-      energia.minimoGizmo
-    );
-
-    console.log(
-      "PORCENTAJE:",
-      porcentaje.toFixed(2) + "%"
-    );
-
-    console.log(
-      "TOTAL DE ASPECTOS:",
-      resultado.aspectos.length
+      "COLOR:",
+      color
     );
 
     console.log(
@@ -1079,7 +1047,5 @@ setInterval(
 
 );
 
-</script>
-
-</body>
+</script></body>
 </html>
