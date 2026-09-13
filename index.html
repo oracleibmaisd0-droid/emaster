@@ -1081,20 +1081,46 @@ async function actualizarCirculo() {
 
 
         /*
-        EL COLOR AHORA SE OBTIENE
-        DEL PORCENTAJE NORMALIZADO.
+        ==========================================
+        COLOR DEL RESULTADO
+        ==========================================
+
+        Si no existe ningún aspecto dentro
+        del orbe establecido, el resultado
+        especial es AZUL.
+
+        El azul NO participa en el cálculo
+        del porcentaje.
+
+        Si existe al menos un aspecto,
+        se utiliza el sistema normal.
         */
 
-        const color =
-            obtenerColor(
-                porcentaje
-            );
+        let color;
+        let nombreColor;
 
 
-        const nombreColor =
-            obtenerNombreColor(
-                porcentaje
-            );
+        if (
+            energia.numeroAspectos === 0
+        ) {
+
+            color = "blue";
+
+            nombreColor = "AZUL";
+
+        } else {
+
+            color =
+                obtenerColor(
+                    porcentaje
+                );
+
+            nombreColor =
+                obtenerNombreColor(
+                    porcentaje
+                );
+
+        }
 
 
         /*
