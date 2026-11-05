@@ -160,6 +160,124 @@ h3 {
     opacity: .65;
   }
 }
+
+/* ==========================================
+   INDICADOR CIRCULAR E-MASTER
+========================================== */
+
+#indicador-completo {
+
+    width: 210px;
+    height: 210px;
+
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 20px auto;
+
+}
+
+
+#aros-astrologicos {
+
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: visible;
+
+    transform: rotate(0deg);
+
+}
+
+
+/* CÍRCULO CENTRAL ORIGINAL */
+
+#circulo-aspecto {
+
+    width: 30px;
+    height: 30px;
+
+    min-width: 30px;
+    min-height: 30px;
+
+    border-radius: 50%;
+
+    z-index: 2;
+
+    position: relative;
+
+}
+
+
+/* AROS */
+
+.arco-astrologico {
+
+    fill: none;
+
+    stroke-width: 5;
+
+    stroke-linecap: butt;
+
+    transition:
+        stroke-dasharray 0.6s ease,
+        stroke-dashoffset 0.6s ease,
+        stroke 0.6s ease;
+
+}
+
+/* ==========================================
+   ANIMACIÓN DE EXPANSIÓN RADIAL
+========================================== */
+
+@keyframes aparecerAros {
+
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+/* ARO EXTERIOR: primero */
+
+#aros-astrologicos .aro-exterior {
+
+    animation: aparecerAros 0.9s
+    cubic-bezier(.22, 1, .36, 1) both;
+
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+/* ARO INTERIOR: ligeramente después */
+
+#aros-astrologicos .aro-interior {
+
+    animation: aparecerAros 0.9s
+    cubic-bezier(.22, 1, .36, 1) 0.18s both;
+
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #aros-astrologicos.animar {
+        animation: none;
+    }
+
+}
 </style>
 
 </head>
@@ -173,7 +291,17 @@ El círculo muestra en tiempo real el estado del aspecto energético predominant
 
 <br><br>
 
-<div id="circulo-aspecto" class="loading"></div>
+<div id="indicador-completo">
+
+    <svg
+        id="aros-astrologicos"
+        viewBox="0 0 210 210"
+        aria-label="Distribución de elementos y modalidades"
+    ></svg>
+
+    <div id="circulo-aspecto" class="loading"></div>
+
+</div>
 
 <script>
 
@@ -317,6 +445,7 @@ function obtenerLongitud(planeta) {
 
     const valor =
         planeta.longitude ??
+        planeta.longitud ??
         planeta.lon ??
         planeta.degree ??
         planeta.position ??
@@ -794,6 +923,432 @@ Conversión:
 ==================================================
 */
 
+/*
+==================================================
+DISTRIBUCIÓN ASTROLÓGICA
+ELEMENTOS Y MODALIDADES
+==================================================
+*/
+
+
+const clasificacionSignos = [
+
+    {
+        elemento: "Fuego",
+        modalidad: "Cardinal"
+    },
+
+    {
+        elemento: "Tierra",
+        modalidad: "Fijo"
+    },
+
+    {
+        elemento: "Aire",
+        modalidad: "Mutable"
+    },
+
+    {
+        elemento: "Agua",
+        modalidad: "Cardinal"
+    },
+
+    {
+        elemento: "Fuego",
+        modalidad: "Fijo"
+    },
+
+    {
+        elemento: "Tierra",
+        modalidad: "Mutable"
+    },
+
+    {
+        elemento: "Aire",
+        modalidad: "Cardinal"
+    },
+
+    {
+        elemento: "Agua",
+        modalidad: "Fijo"
+    },
+
+    {
+        elemento: "Fuego",
+        modalidad: "Mutable"
+    },
+
+    {
+        elemento: "Tierra",
+        modalidad: "Cardinal"
+    },
+
+    {
+        elemento: "Aire",
+        modalidad: "Fijo"
+    },
+
+    {
+        elemento: "Agua",
+        modalidad: "Mutable"
+    }
+
+];
+
+
+/*
+COLORES
+*/
+
+const coloresElementos = {
+
+    Fuego: "#f44336",
+
+    Tierra: "#43a85b",
+
+    Agua: "#2585df",
+
+    Aire: "#b9e7f5"
+
+};
+
+
+const coloresModalidades = {
+
+    Cardinal: "#f44336",
+
+    Fijo: "#43a85b",
+
+    Mutable: "#2585df"
+
+};
+
+
+/*
+ORDEN DE LOS SEGMENTOS
+*/
+
+const ordenElementos = [
+
+    "Fuego",
+    "Tierra",
+    "Agua",
+    "Aire"
+
+];
+
+
+const ordenModalidades = [
+
+    "Cardinal",
+    "Fijo",
+    "Mutable"
+
+];
+
+
+/*
+==================================================
+CONTABILIZAR POSICIONES
+==================================================
+*/
+
+function calcularDistribucion(planetas) {
+
+    const elementos = {
+
+        Fuego: 0,
+        Tierra: 0,
+        Agua: 0,
+        Aire: 0
+
+    };
+
+
+    const modalidades = {
+
+        Cardinal: 0,
+        Fijo: 0,
+        Mutable: 0
+
+    };
+
+
+    let total = 0;
+
+
+    for (const planeta of planetas) {
+
+        const longitud = obtenerLongitud(planeta);
+
+        if (typeof longitud !== "number") {
+            continue;
+        }
+
+
+        const angulo = normalizarAngulo(longitud);
+
+
+        /*
+        Cada signo ocupa 30 grados.
+        */
+
+        const indiceSigno =
+            Math.floor(angulo / 30);
+
+
+        const clasificacion =
+            clasificacionSignos[indiceSigno];
+
+
+        if (!clasificacion) {
+            continue;
+        }
+
+
+        elementos[clasificacion.elemento]++;
+
+        modalidades[clasificacion.modalidad]++;
+
+        total++;
+
+    }
+
+
+    return {
+
+        elementos,
+        modalidades,
+        total
+
+    };
+
+}
+
+
+/*
+==================================================
+DIBUJAR AROS CIRCULARES
+==================================================
+*/
+
+function dibujarAro(svg, datos, orden, colores, radio) {
+
+    const NS =
+        "http://www.w3.org/2000/svg";
+
+
+    const centro = 105;
+
+    const grosor = 5;
+
+    const circunferencia =
+        2 * Math.PI * radio;
+
+
+    let desplazamiento = 0;
+
+
+    for (const nombre of orden) {
+
+        const cantidad = datos[nombre];
+
+
+        const porcentaje =
+            datos.total > 0
+                ? cantidad / datos.total
+                : 0;
+
+
+        if (porcentaje <= 0) {
+            continue;
+        }
+
+
+        const longitud =
+            circunferencia * porcentaje;
+
+
+        const arco =
+            document.createElementNS(
+                NS,
+                "circle"
+            );
+
+
+        arco.setAttribute("cx", centro);
+
+        arco.setAttribute("cy", centro);
+
+        arco.setAttribute("r", radio);
+
+
+        arco.setAttribute(
+    "class",
+    "arco-astrologico " +
+    (radio === 88 ? "aro-exterior" : "aro-interior")
+);
+
+
+        arco.setAttribute(
+            "stroke",
+            colores[nombre]
+        );
+
+
+        arco.setAttribute(
+            "stroke-dasharray",
+            `${longitud} ${circunferencia - longitud}`
+        );
+
+
+        arco.setAttribute(
+            "stroke-dashoffset",
+            -desplazamiento
+        );
+
+
+        arco.setAttribute(
+            "transform",
+            `rotate(-90 ${centro} ${centro})`
+        );
+
+
+        const titulo =
+            document.createElementNS(
+                NS,
+                "title"
+            );
+
+
+        titulo.textContent =
+            `${nombre}: ${cantidad}/${datos.total} (${(porcentaje * 100).toFixed(1)}%)`;
+
+
+        arco.appendChild(titulo);
+
+        svg.appendChild(arco);
+
+
+        desplazamiento += longitud;
+
+    }
+
+}
+
+
+/*
+==================================================
+ACTUALIZAR LOS DOS AROS
+==================================================
+*/
+
+function actualizarAros(planetas) {
+
+    const svg =
+        document.getElementById(
+            "aros-astrologicos"
+        );
+
+
+svg.classList.remove("animar");
+
+svg.innerHTML = "";
+
+
+    const distribucion =
+        calcularDistribucion(planetas);
+
+
+    const total =
+        distribucion.total;
+
+
+    const elementos = {
+
+        ...distribucion.elementos,
+
+        total: total
+
+    };
+
+
+    const modalidades = {
+
+        ...distribucion.modalidades,
+
+        total: total
+
+    };
+
+
+    /*
+    ARO INTERIOR:
+    ELEMENTOS
+
+    Fuego → Tierra → Agua → Aire
+    */
+
+    dibujarAro(
+
+        svg,
+
+        elementos,
+
+        ordenElementos,
+
+        coloresElementos,
+
+        66
+
+    );
+
+
+    /*
+    ARO EXTERIOR:
+    MODALIDADES
+
+    Cardinal → Fijo → Mutable
+    */
+
+    dibujarAro(
+
+        svg,
+
+        modalidades,
+
+        ordenModalidades,
+
+        coloresModalidades,
+
+        88
+
+    );
+
+
+    /*
+    INFORMACIÓN DE DEPURACIÓN
+    */
+
+    console.log(
+        "DISTRIBUCIÓN ELEMENTAL:",
+        elementos
+    );
+
+
+    console.log(
+        "DISTRIBUCIÓN MODAL:",
+        modalidades
+    );
+
+/*
+ANIMACIÓN DE EXPANSIÓN RADIAL
+*/
+
+
+
+}
+
 function calcularEnergia(aspectos) {
 
     let suma = 0;
@@ -1130,6 +1685,12 @@ async function actualizarCirculo() {
 
         const resultado =
             await obtenerAspectos();
+            
+/*
+ACTUALIZAR ELEMENTOS Y MODALIDADES
+*/
+
+actualizarAros(resultado.puntos);
 
 
         /*
@@ -1189,6 +1750,7 @@ async function actualizarCirculo() {
                 obtenerNombreColor(
                     porcentaje
                 );
+
 
         }
 
