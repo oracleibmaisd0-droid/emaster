@@ -1212,13 +1212,7 @@ function dibujarAro(svg, datos, orden, colores, radio) {
 
         arco.setAttribute(
             "stroke-dashoffset",
-            -desplazamiento
-        );
-
-
-        arco.setAttribute(
-            "transform",
-            `rotate(-90 ${centro} ${centro})`
+            circunferencia / 4 - desplazamiento
         );
 
 
